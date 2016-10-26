@@ -3,7 +3,7 @@
 
 """
 Usage:
-    yatr [options] [<text>]
+    yatr [options] [<text> ...]
 
 Options:
     -h --help                   Show help information
@@ -14,7 +14,7 @@ Options:
     --raw                       Bla
     --debug                     Bla
     --list-languages            Bla
-
+    --default-language LANG     Bla [default: en]
 
 Arguments:
     <text>                      Bla-Bla
@@ -91,20 +91,23 @@ def show_langs():
 def get_options():
     options = docopt.docopt(__doc__)
 
+    if options['--debug']:
+        sys.stderr.write(repr(options) + '\n')
+
     if options['--list-languages']:
         show_langs()
         exit()
 
     answer = {}
-    if options['<text>'] is not None:
-        answer['text'] = options['<text>'].decode('utf-8')
+    if options['<text>']:
+        answer['text'] = " ".join(options['<text>']).decode('utf-8')
     else:
         answer['text'] = get_selection().decode('utf-8')
     answer['text_lang'] = ya_translator.detect(answer['text'])
 
     if options['--to'] is None:
         if answer['text_lang'] == 'ru':
-            answer['to'] = 'en'
+            answer['to'] = options['--default-language']
         else:
             answer['to'] = 'ru'
     else:
@@ -126,11 +129,10 @@ def get_options():
     elif options['--raw']:
         answer['output_mode'] = 'raw'
     else:
-        answer['output_mode'] = 'stdout'
+        answer['output_mode'] = 'notify'
 
     if options['--debug']:
-        sys.stderr(repr(options) + '\n')
-        sys.stderr(repr(answer) + '\n')
+        sys.stderr.write(repr(answer) + '\n')
 
     return answer
 
@@ -167,10 +169,13 @@ def lookup_in_dictionary(text, lang):
 if __name__ == '__main__':
     options = get_options()
 
-    dictionary_translation = lookup_in_dictionary(
-        options['text'],
-        options['lang']
-    )
+    try:
+        dictionary_translation = lookup_in_dictionary(
+            options['text'],
+            options['lang']
+        )
+    except services_api.YandexDictionaryException:
+        dictionary_translation = None
 
     if dictionary_translation is not None:
         text = options['text']
