@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # coding: utf-8
 
 """
@@ -62,7 +62,7 @@ def send_notify(title, message, speed=300, min_delay=10):
 
 def write_output(text, translation, lang, mode):
     if mode == 'raw':
-        print translation
+        print(translation)
         return
 
     from_, to = lang.split('-')
@@ -73,8 +73,8 @@ def write_output(text, translation, lang, mode):
     if mode == 'notify':
         send_notify(output_part_A, output_part_B)
     elif mode == 'stdout':
-        print output_part_A
-        print output_part_B
+        print(output_part_A)
+        print(output_part_B)
 
 
 def show_langs():
@@ -85,7 +85,7 @@ def show_langs():
         directions[from_].append(to)
 
     for from_ in sorted(directions.keys()):
-        print "{}: {}".format(from_, ", ".join(sorted(directions[from_])))
+        print("{}: {}".format(from_, ", ".join(sorted(directions[from_]))))
 
 
 def get_options():
@@ -100,9 +100,9 @@ def get_options():
 
     answer = {}
     if options['<text>']:
-        answer['text'] = " ".join(options['<text>']).decode('utf-8')
+        answer['text'] = " ".join(options['<text>'])
     else:
-        answer['text'] = get_selection().decode('utf-8')
+        answer['text'] = get_selection()
     answer['text_lang'] = ya_translator.detect(answer['text'])
 
     if options['--to'] is None:
